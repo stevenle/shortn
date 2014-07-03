@@ -10,7 +10,7 @@ sudo apt-get install git-core httpie lxc-docker
 
 git clone https://github.com/stevenle/shortn.git
 sudo docker build -t stevenle/shortn shortn
-sudo docker run -d -p 8080:8080 stevenle/shortn shortn
+sudo docker run -d -p 8080:8080 -p 9090:9090 stevenle/shortn shortn
 
 # Make sure server's running:
 http localhost:8080/ping  # should output "pong"
