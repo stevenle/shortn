@@ -17,23 +17,50 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
-	// TODO(stevenle): Implement.
-	// "github.com/stevenle/shortn/handlers"
+	"github.com/stevenle/shortn/handlers"
+	"github.com/stevenle/shortn/kvstore"
 	"github.com/stevenle/web"
 )
 
-func pingHandler(ctx *web.Context) {
-	web.WriteResponseString(ctx, "pong\n")
-}
-
 func main() {
-	router := web.NewRouter()
-	router.HandleFunc("/ping", pingHandler)
+	defer kvstore.Close()
 
-	s := &http.Server{
-		Addr:    ":8080",
-		Handler: router,
-	}
-	log.Fatal(s.ListenAndServe())
+	// Start the server in a goroutine listening on port 8080.
+	go func() {
+		router := web.NewRouter()
+		router.HandleFunc("/ping", handlers.PingHandler)
+		router.HandleFunc("/go/*id", handlers.GoHandler)
+
+		s := &http.Server{
+			Addr:    ":8080",
+			Handler: router,
+		}
+		if err := s.ListenAndServe(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	// Start the internal API, which should never be exposed publicly.
+	go func() {
+		router := web.NewRouter()
+		router.HandleFunc("/ping", handlers.PingHandler)
+		router.HandleFunc("/go/*id", handlers.GoRegisterHandler)
+
+		s := &http.Server{
+			Addr:    ":9090",
+			Handler: router,
+		}
+		if err := s.ListenAndServe(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	// Exit cleanly.
+	sigchan := make(chan os.Signal)
+	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
+	<-sigchan
 }
