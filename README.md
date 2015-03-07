@@ -11,7 +11,7 @@ intended for production services.
 
 # On Ubuntu 14.04:
 sudo apt-get update
-sudo apt-get install git-core httpie lxc-docker
+sudo apt-get install git-core httpie docker.io
 
 git clone https://github.com/stevenle/shortn.git
 sudo docker build -t stevenle/shortn shortn
