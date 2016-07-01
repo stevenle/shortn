@@ -1,0 +1,37 @@
+{
+	"ImportPath": "github.com/stevenle/shortn",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v74",
+	"Deps": [
+		{
+			"ImportPath": "github.com/fatih/color",
+			"Comment": "v0.1-19-g87d4004",
+			"Rev": "87d4004f2ab62d0d255e0a38f1680aa534549fe3"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-colorable",
+			"Comment": "v0.0.5",
+			"Rev": "9056b7a9f2d1f2d96498d6d146acd1f9d5ed3d59"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-isatty",
+			"Rev": "56b76bdf51f7708750eac80fa38b952bb9f32639"
+		},
+		{
+			"ImportPath": "github.com/stevenle/logging",
+			"Rev": "35988694aeb824d78facd930167ec219e10f5814"
+		},
+		{
+			"ImportPath": "github.com/stevenle/routetrie",
+			"Rev": "7db9f5dc49d2f782558503decb0d63b9eacadc87"
+		},
+		{
+			"ImportPath": "github.com/stevenle/web",
+			"Rev": "856d5ff745bad0e3b7dda1c1eb050d2ec52544ed"
+		},
+		{
+			"ImportPath": "golang.org/x/sys/unix",
+			"Rev": "62bee037599929a6e9146f29d10dd5208c43507d"
+		}
+	]
+}

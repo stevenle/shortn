@@ -15,12 +15,12 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/stevenle/logging"
 	"github.com/stevenle/shortn/handlers"
 	"github.com/stevenle/shortn/kvstore"
 	"github.com/stevenle/web"
@@ -32,30 +32,32 @@ func main() {
 	// Start the server in a goroutine listening on port 8080.
 	go func() {
 		router := web.NewRouter()
-		router.HandleFunc("/ping", handlers.PingHandler)
-		router.HandleFunc("/go/*id", handlers.GoHandler)
+		router.HandleFunc("/_/ping", handlers.PingHandler)
+		router.HandleFunc("/*id", handlers.GoHandler)
 
 		s := &http.Server{
 			Addr:    ":8080",
 			Handler: router,
 		}
+		logging.Infof("starting server on port 8080")
 		if err := s.ListenAndServe(); err != nil {
-			log.Fatal(err)
+			logging.Fatalf("failed to start server: %s", err)
 		}
 	}()
 
 	// Start the internal API, which should never be exposed publicly.
 	go func() {
 		router := web.NewRouter()
-		router.HandleFunc("/ping", handlers.PingHandler)
-		router.HandleFunc("/go/*id", handlers.GoRegisterHandler)
+		router.HandleFunc("/_/ping", handlers.PingHandler)
+		router.HandleFunc("/*id", handlers.GoRegisterHandler)
 
 		s := &http.Server{
 			Addr:    ":9090",
 			Handler: router,
 		}
+		logging.Infof("starting api server on port 9090")
 		if err := s.ListenAndServe(); err != nil {
-			log.Fatal(err)
+			logging.Fatalf("failed to start api server: %s", err)
 		}
 	}()
 

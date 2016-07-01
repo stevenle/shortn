@@ -12,18 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package kvstore is a simple in-memory data store that persists to the
+// filesystem.
 package kvstore
 
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"os"
+
+	"github.com/stevenle/logging"
 )
 
 var store map[string]string
 
-const storePath = "/var/tmp/shortn.json"
+const storePath = "/var/shortn/kvstore.json"
 
 func init() {
 	store = make(map[string]string)
@@ -32,21 +35,23 @@ func init() {
 		return
 	}
 
-	log.Printf("Initializing from %q", storePath)
+	logging.Infof("initializing kvstore from %s", storePath)
 
 	data, err := ioutil.ReadFile(storePath)
 	if err != nil {
-		log.Fatal(err)
+		logging.Fatalf("failed to load kvstore: %s", err)
 	}
 	err = json.Unmarshal(data, &store)
 	if err != nil {
-		log.Fatal(err)
+		logging.Fatalf("failed to parse kvstore: %s", err)
 	}
 }
 
 func Set(key, value string) bool {
 	_, found := store[key]
 	store[key] = value
+	logging.Infof("set \"%s\" to \"%s\"", key, value)
+	go saveToFile()
 	return !found
 }
 
@@ -56,16 +61,26 @@ func Get(key string) string {
 
 // Close saves the store to the filesystem for persistence.
 func Close() {
+	saveToFile()
+}
+
+func saveToFile() {
 	if len(store) == 0 {
 		return
 	}
 
 	file, err := os.Create(storePath)
 	if err != nil {
-		log.Fatal(err)
+		logging.Errorf("failed to open file %s: %s", storePath, err)
+		return
 	}
 	defer file.Close()
 
 	encoder := json.NewEncoder(file)
-	encoder.Encode(store)
+	err = encoder.Encode(store)
+	if err != nil {
+		logging.Errorf("failed to save kvstore, err: %s", err)
+		return
+	}
+	logging.Infof("saved kvstore to %s", storePath)
 }

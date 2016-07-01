@@ -10,9 +10,6 @@ intended for production services.
 ```bash
 
 # On Ubuntu 14.04:
-sudo apt-get update
-sudo apt-get install git-core httpie docker.io
-
 git clone https://github.com/stevenle/shortn.git
 sudo docker build -t stevenle/shortn shortn
 sudo docker run -d -p 8080:8080 -p 9090:9090 stevenle/shortn shortn
@@ -22,11 +19,11 @@ sudo docker run -d -p 8080:8080 -p 9090:9090 stevenle/shortn shortn
 
 ```bash
 # Make sure server's running:
-http localhost:8080/ping  # should output "pong"
+http localhost:8080/_/ping  # should output "pong"
 
 # Add a url:
-http PUT localhost:9090/go/foo url=http://www.google.com
+http PUT localhost:9090/foo url=http://www.google.com
 
 # Go to a url:
-http GET localhost:8080/go/foo
+http GET localhost:8080/foo
 ```
