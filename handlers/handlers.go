@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/stevenle/logging"
 	"github.com/stevenle/shortn/kvstore"
 	"github.com/stevenle/web"
 )
@@ -34,9 +35,14 @@ func GoHandler(ctx *web.Context) {
 		return
 	}
 
-	u := kvstore.Get(ctx.Params["id"])
+	id := ctx.Params["id"]
+	u := kvstore.Get(id)
+	logging.Infof("GET /%s", id)
 	if u == "" {
+		logging.Errorf("not found: %s", id)
+		web.SetHeader(ctx, "Content-Type", "text/plain")
 		web.SetStatusCode(ctx, http.StatusNotFound)
+		web.WriteResponseString(ctx, "404 Not Found\n")
 		return
 	}
 	web.Redirect(ctx, u, http.StatusFound)
@@ -57,6 +63,8 @@ func GoRegisterHandler(ctx *web.Context) {
 		web.SetStatusCode(ctx, http.StatusBadRequest)
 		return
 	}
+
+	logging.Infof("PUT /%s", id)
 
 	var request PutRequest
 	decoder := json.NewDecoder(ctx.Request.Body)
